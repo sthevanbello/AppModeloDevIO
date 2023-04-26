@@ -25,6 +25,10 @@ namespace DevIO.UI.Site
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+            app.MapAreaControllerRoute(
+                name: "areas",
+                areaName: "Produtos",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
 
             // Colocando a App para rodar
             app.Run();
