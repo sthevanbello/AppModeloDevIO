@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using DevIO.Identity.Areas.Identity.Data;
 using NuGet.LibraryModel;
+using DevIO.Identity.Extensions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DevIO.Identity
 {
@@ -32,6 +34,7 @@ namespace DevIO.Identity
             builder.Services
                 .AddDefaultIdentity<IdentityUser>(options => 
                                                     options.SignIn.RequireConfirmedAccount = true)
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<DevIOIdentityContext>();
 
             // Add services to the container.
@@ -40,6 +43,17 @@ namespace DevIO.Identity
             // Adicionando o serviço no pipeline
 
             builder.Services.AddRazorPages();
+
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("PodeExcluir", policy => policy.RequireClaim("PodeExcluir"));
+
+                options.AddPolicy("PodeLer", policy => policy.Requirements.Add(new PermissaoNecessaria ("PodeLer")));
+
+                options.AddPolicy("PodeEscrever", policy => policy.Requirements.Add(new PermissaoNecessaria ("PodeEscrever")));
+            });
+
+            builder.Services.AddSingleton<IAuthorizationHandler, PermissaoNecessariaHandler>();
 
             var app = builder.Build();
 

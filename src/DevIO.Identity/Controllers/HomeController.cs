@@ -32,6 +32,18 @@ namespace DevIO.Identity.Controllers
             return View();
         }
 
+        [Authorize(Policy = "PodeExcluir")]
+        public IActionResult SecretClaimExcluir()
+        {
+            return View();
+        }
+
+        [Authorize(Policy = "PodeEscrever")]
+        public IActionResult SecretClaimEscrever()
+        {
+            return View();
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
