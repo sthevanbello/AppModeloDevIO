@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using DevIO.Identity.Areas.Identity.Data;
+using NuGet.LibraryModel;
+
 namespace DevIO.Identity
 {
     public class Program
@@ -8,24 +10,47 @@ namespace DevIO.Identity
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-                        var connectionString = builder.Configuration.GetConnectionString("DevIOIdentityContextConnection") ?? throw new InvalidOperationException("Connection string 'DevIOIdentityContextConnection' not found.");
 
-                                    builder.Services.AddDbContext<DevIOIdentityContext>(options =>
-                options.UseSqlServer(connectionString));
+            builder.Configuration
+                .SetBasePath(builder.Environment.ContentRootPath)
+                .AddJsonFile("appsettings.json", true, true)
+                .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true, true)
+                .AddEnvironmentVariables();
 
-                                                builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            builder.Services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+
+            var connectionString = builder.Configuration
+                .GetConnectionString("DevIOIdentityContextConnection") ?? throw new InvalidOperationException("Connection string 'DevIOIdentityContextConnection' not found.");
+
+            builder.Services.AddDbContext<DevIOIdentityContext>(options =>
+                                                                options.UseSqlServer(connectionString));
+
+            builder.Services
+                .AddDefaultIdentity<IdentityUser>(options => 
+                                                    options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<DevIOIdentityContext>();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
+            // Adicionando o serviço no pipeline
+
+            builder.Services.AddRazorPages();
+
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
+            if (app.Environment.IsDevelopment())
             {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/erro/500");
+                app.UseStatusCodePagesWithRedirects("/erro/{0}");
                 app.UseHsts();
             }
 
@@ -33,13 +58,18 @@ namespace DevIO.Identity
             app.UseStaticFiles();
 
             app.UseRouting();
-                        app.UseAuthentication();;
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            // Mapeando componentes Razor Pages (ex: Identity)
+
+            app.MapRazorPages();
 
             app.Run();
         }
