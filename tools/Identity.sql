@@ -14,6 +14,6 @@ select * from AspNetUserClaims
 --values ('00fd2e1e-249c-4751-8cfd-6da1c0794137', 1).
 
 --insert into AspNetUserClaims(UserId, ClaimType, ClaimValue)
---values ('00fd2e1e-249c-4751-8cfd-6da1c0794137', 'PodeExcluir', 'PodeExcluir')
+--values ('00fd2e1e-249c-4751-8cfd-6da1c0794137', 'Permissao', 'PodeExcluir, PodeEscrever, PodeLer')
 
 --update AspNetUserClaims set ClaimType = 'PodeExcluir' where id = 1

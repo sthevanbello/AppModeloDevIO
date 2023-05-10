@@ -1,4 +1,5 @@
-﻿using DevIO.Identity.Models;
+﻿using DevIO.Identity.Extensions;
+using DevIO.Identity.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -40,6 +41,12 @@ namespace DevIO.Identity.Controllers
 
         [Authorize(Policy = "PodeEscrever")]
         public IActionResult SecretClaimEscrever()
+        {
+            return View();
+        }
+
+        [ClaimsAuthorize("Produtos", "Ler")]
+        public IActionResult ClaimsCustom()
         {
             return View();
         }
